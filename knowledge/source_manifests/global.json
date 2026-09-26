@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {"source_id":"WIPO","title":"World Intellectual Property Organization","url":"https://www.wipo.int/","authority":"WIPO","tier":"tier_1","jurisdiction":"GLOBAL","regime":"international_ip"},
+    {"source_id":"PCT","title":"Patent Cooperation Treaty","url":"https://www.wipo.int/pct/en/","authority":"WIPO","tier":"tier_1","jurisdiction":"GLOBAL","regime":"patent_filing"},
+    {"source_id":"MADRID","title":"Madrid System","url":"https://www.wipo.int/madrid/en/","authority":"WIPO","tier":"tier_1","jurisdiction":"GLOBAL","regime":"trademark_filing"},
+    {"source_id":"HAGUE","title":"Hague System","url":"https://www.wipo.int/hague/en/","authority":"WIPO","tier":"tier_1","jurisdiction":"GLOBAL","regime":"design_filing"},
+    {"source_id":"CBD-ABS","title":"Convention on Biological Diversity — ABS","url":"https://www.cbd.int/abs/","authority":"CBD","tier":"tier_1","jurisdiction":"GLOBAL","regime":"abs"}
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "country_code":"DE",
+  "country_name":"Germany",
+  "regulatory_regions":["EU"],
+  "profile_version":"2026-09-01",
+  "ip_office":{"name":"DPMA","url":"https://www.dpma.de/"},
+  "product_categories":[],
+  "herbal_medicine_rules":[],
+  "food_rules":[],
+  "cosmetic_rules":[],
+  "drug_rules":[],
+  "labelling_rules":[],
+  "advertising_rules":[],
+  "import_rules":[],
+  "traditional_medicine_pathways":[],
+  "required_documents":[],
+  "authoritative_sources":[
+    {
+      "authority":"European Medicines Agency",
+      "title":"Herbal medicinal products",
+      "url":"https://www.ema.europa.eu/en/human-regulatory-overview/herbal-medicinal-products",
+      "topic":"Herbal medicinal product pathways and EU monographs",
+      "source_type":"official_discovery_pointer",
+      "verified_as_evidence":false
+    },
+    {
+      "authority":"European Commission",
+      "title":"Novel Food",
+      "url":"https://food.ec.europa.eu/food-safety/novel-food_en",
+      "topic":"EU novel-food status and authorisation information",
+      "source_type":"official_discovery_pointer",
+      "verified_as_evidence":false
+    },
+    {
+      "authority":"German Patent and Trade Mark Office (DPMA)",
+      "title":"Patents",
+      "url":"https://www.dpma.de/english/patents/index.html",
+      "topic":"German patent information, search and application process",
+      "source_type":"official_discovery_pointer",
+      "verified_as_evidence":false
+    }
+  ]
+}

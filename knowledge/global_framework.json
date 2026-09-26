@@ -1,0 +1,6 @@
+{
+  "framework":"GLOBAL_FRAMEWORK",
+  "version":"2026-09-01",
+  "instruments":["TRIPS","CBD","Nagoya Protocol","WIPO GRATK","PCT","Madrid System","Hague System","Budapest Treaty"],
+  "rule":"Global instruments provide international framework context; country-specific market authorization and national IP law must be retrieved from the target jurisdiction."
+}

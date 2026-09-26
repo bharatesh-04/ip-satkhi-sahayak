@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {"source_id":"INDIA-CODE","title":"India Code","url":"https://www.indiacode.nic.in/","authority":"India Code","tier":"tier_1","jurisdiction":"IN","regime":"legislation"},
+    {"source_id":"IP-INDIA","title":"IP India","url":"https://ipindia.gov.in/","authority":"IP India","tier":"tier_1","jurisdiction":"IN","regime":"ip"},
+    {"source_id":"AYUSH","title":"Ministry of Ayush","url":"https://ayush.gov.in/","authority":"Ministry of Ayush","tier":"tier_1","jurisdiction":"IN","regime":"ayush"},
+    {"source_id":"CDSCO","title":"CDSCO Traditional Drugs","url":"https://www.cdsco.gov.in/","authority":"CDSCO","tier":"tier_1","jurisdiction":"IN","regime":"drug"},
+    {"source_id":"FSSAI","title":"FSSAI Food Regulations","url":"https://www.fssai.gov.in/food-law/regulations","authority":"FSSAI","tier":"tier_1","jurisdiction":"IN","regime":"food"},
+    {"source_id":"NBA","title":"National Biodiversity Authority","url":"https://nbaindia.org/","authority":"National Biodiversity Authority","tier":"tier_1","jurisdiction":"IN","regime":"abs"},
+    {"source_id":"TKDL","title":"CSIR Traditional Knowledge Digital Library","url":"https://www.csir.res.in/en/documents/tkdl","authority":"CSIR-TKDL","tier":"tier_1","jurisdiction":"IN","regime":"traditional_knowledge","access_level":"RESTRICTED"},
+    {"source_id":"FSSAI-AYURVEDA-AHARA-2022","title":"Food Safety and Standards (Ayurveda Aahara) Regulations, 2022","url":"https://www.fssai.gov.in/docs/food-law/regulations/62789a20b54bdGazette_Notification_Ayurveda_Aahara_09_05_2022.pdf","local_path":"data/raw/FSSAI-AYURVEDA-AHARA-2022.pdf","authority":"Food Safety and Standards Authority of India","tier":"tier_1","jurisdiction":"IN","regime":"ayurveda_food","version":"2022"},
+    {"source_id":"FSSAI-ADVERTISING-CLAIMS-2018","title":"Food Safety and Standards (Advertising and Claims) Regulations, 2018","url":"https://www.fssai.gov.in/docs/food-law/regulations/Gazette_Notification_Advertising_Claims_27_11_2018.pdf","local_path":"data/raw/FSSAI-ADVERTISING-CLAIMS-2018.pdf","authority":"Food Safety and Standards Authority of India","tier":"tier_1","jurisdiction":"IN","regime":"advertising","version":"2018"},
+    {"source_id":"FSSAI-LABELLING-DISPLAY-2020","title":"Food Safety and Standards (Labelling and Display) Regulations, 2020","url":"https://www.fssai.gov.in/docs/food-law/regulations/5fd87c6a0f6adGazette_Notification_Labelling_Display_14_12_2020.pdf","local_path":"data/raw/FSSAI-LABELLING-DISPLAY-2020.pdf","authority":"Food Safety and Standards Authority of India","tier":"tier_1","jurisdiction":"IN","regime":"labelling","version":"2020"}
+  ]
+}
