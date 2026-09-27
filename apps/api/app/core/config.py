@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_version: str = "0.1.0"
     demo_mode: bool = True
+    frontend_url: str = ""
 
     # Hackathon default: local SQLite keeps the repo runnable without Docker.
     # Docker/production uses PostgreSQL + pgvector via DATABASE_URL.
