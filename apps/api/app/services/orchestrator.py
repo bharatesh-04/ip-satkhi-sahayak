@@ -98,6 +98,7 @@ class Orchestrator:
         )]
 
     async def _generate(self, req, profile, plan, evidence, graph_context, memory_records) -> str:
+        language = (req.language or "en").lower()
         if settings.llm_provider == "mock":
             product = profile.product_name or profile.category.replace("_", " ")
             market = req.target_country or "India"
@@ -106,6 +107,22 @@ class Orchestrator:
                 f"[{item.evidence_id}] {item.citation} ({item.jurisdiction}, {item.status})"
                 for item in evidence[:3]
             )
+            if language == "hi":
+                return (
+                    f"प्रारंभिक मूल्यांकन: यह {market} के लिए {product} से संबंधित प्रश्न है। "
+                    f"प्रोफ़ाइल {profile.classification_confidence:.0%} आत्मविश्वास के साथ है; "
+                    f"अभी की आवश्यकता: {missing}। मार्ग चुनने से पहले सटीक फॉर्मूलेशन, उपयोग का उद्देश्य, "
+                    "उत्पाद के दावे, निर्माण स्थल और घटक मूल की पुष्टि करें। "
+                    f"प्राप्त साक्ष्य: {source_refs}। यह नेविगेशन सहायता है, कानूनी निर्णय नहीं।"
+                )[:600]
+            if language == "kn":
+                return (
+                    f"ಪ್ರಾಥಮಿಕ ಮೌಲ್ಯಮಾಪನೆ: ಇದು {market} ಗುರಿಯೊಂದಿಗೆ {product} ಸಂಬಂಧಿತ ಪ್ರಶ್ನೆ. "
+                    f"ಪ್ರೊಫೈಲ್ {profile.classification_confidence:.0%} ನಿಶ್ಚಿತತ ಹೊಂದಿದೆ; "
+                    f"ಇನ್ನೂ ಅಗತ್ಯವಿರುವ ವಿವರಗಳು: {missing}. ಮಾರ್ಗವನ್ನು ಆಯ್ಕೆ ಮಾಡುವ ಮೊದಲು ನಿಖರವಾದ ಫಾರ್ಮ್ಯುಲೇಷನ್, ಉದ್ದೇಶಿತ ಬಳಕೆ, "
+                    "ಉತ್ಪನ್ನದ ಕ್ಲೈಮ್ಗಳು, ತಯಾರಿಕಾ ಸ್ಥಳ ಮತ್ತು ಘಟಕ ಮೂಲಗಳನ್ನು ದೃಢೀಕರಿಸಿ. "
+                    f"ಪಡೆಯಲಾದ ಸಮರ್ಥನ: {source_refs}. ಇದು ನ್ಯಾವಿಗೇಷನ್ ನೆರವೇರಿಸುವುದಲ್ಲ, ಕಾನೂನು ನಿರ್ಣಯವಲ್ಲ."
+                )[:600]
             return (
                 f"Preliminary assessment: this is a {product} query for {market}. "
                 f"The profile is {profile.classification_confidence:.0%} confident; "
@@ -125,11 +142,12 @@ class Orchestrator:
             f"PLAN: {plan.model_dump()}\n"
             f"MEMORY_CONTEXT: {memory_lines}\n"
             f"GRAPH_FACTS: {graph_context}\n"
+            f"TARGET_LANGUAGE: {language}\n"
             "VERIFIED_EVIDENCE:\n" + "\n".join(evidence_lines) + "\n"
             "Constraints: use only the evidence; preserve jurisdiction and effective dates; "
-            "do not fabricate law or citations; state uncertainty; not legal advice."
+            "do not fabricate law or citations; state uncertainty; not legal advice; reply in the target language."
         )
-        return await self.llm.generate(prompt)
+        return await self.llm.generate(prompt, language=language)
 
     def build_response_from_state(self, state: dict) -> FinalResponse:
         req = state["request"]
@@ -152,16 +170,47 @@ class Orchestrator:
             source_pointers = self._source_pointers(req)
             if source_pointers:
                 warnings.append("Official source pointers below are discovery links, not verified evidence.")
-            return FinalResponse(
-                summary=(
+            lang = (req.language or "en").lower()
+            if lang == "hi":
+                summary = (
+                    f"मैं वर्तमान में इंडेक्स किए गए साक्ष्य के आधार पर {req.target_country} बाजार-प्रवेश निष्कर्ष का समर्थन नहीं कर सकता। "
+                    "नीचे दिए गए आधिकारिक लिंक केवल प्रारंभिक बिंदु हैं; वे आपके उत्पाद के खिलाफ सत्यापित नहीं किए गए हैं। "
+                    "पहले सत्यापित करें कि यह खाद्य या दवा के रूप में बेचा जा रहा है, इसका उद्देश्य, सटीक रचना और दावे क्या हैं।"
+                    if req.jurisdiction_mode.value == "international"
+                    else "मैं उपलब्ध साक्ष्य से विश्वसनीय निष्कर्ष सत्यापित नहीं कर सका। कृपया उत्पाद की जानकारी जोड़ें या अधिकृत स्रोत से परामर्श करें।"
+                )
+                next_steps = [
+                    "उद्देश्यित उपयोग, उत्पाद के दावे, सटीक फॉर्मूलेशन और घटक मूल को सत्यापित करें।",
+                    "कानूनी निष्कर्ष पर भरोसा करने से पहले इस अधिकार क्षेत्र के लिए वर्तमान प्राथमिक स्रोतों को इंटीग्रेट करें।",
+                ]
+            elif lang == "kn":
+                summary = (
+                    f"ಪ್ರಸ್ತುತ ಇಂಡೆಕ್ಸ್ಡ್ ಸಮರ್ಥನಗಳ ಆಧಾರದ ಮೇಲೆ {req.target_country} ಮಾರುಕಟ್ಟೆ-ಪ್ರವೇಶ ತೀರ್ಮಾನವನ್ನು ನಾನು ಬೆಂಬಲಿಸಲಾರೆನು. "
+                    "ಕೆಳಗಿನ ಅಧಿಕೃತ ಲಿಂಕ್ಗಳು ಕೇವಲ ಪ್ರಾರಂಭಿಕ ಬಿಂದುಗಳಾಗಿವೆ; ಅವು ನಿಮ್ಮ ಉತ್ಪನ್ನಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ಪರಿಶೀಲಿಸಿಲ್ಲ. "
+                    "ಮೊದಲಿಗೆ ಇದು ಆಹಾರ ಅಥವಾ ಔಷಧಿಯಾಗಿ ಮಾರಾಟವಾಗುತ್ತಿದೆಯೇ, ಅದರ ಉದ್ದೇಶ, ನಿಖರ ಸಂಯೋಜನೆ ಮತ್ತು ಕ್ಲೈಮ್ಗಳು ಯಾವುವು ಎಂಬುದನ್ನು ದೃಢೀಕರಿಸಿ."
+                    if req.jurisdiction_mode.value == "international"
+                    else "ಲಭ್ಯವಿರುವ ಸಮರ್ಥನಗಳಿಂದ ವಿಶ್ವಾಸಾರ್ಹ ತೀರ್ಮಾನವನ್ನು ನಾನು ಪರಿಶೀಲಿಸದಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ಉತ್ಪನ್ನ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ ಅಥವಾ ಅಧಿಕೃತ ಮೂಲದೊಂದಿಗೆ ಸಮಾಲೋಚಿಸಿ."
+                )
+                next_steps = [
+                    "ಉದ್ದೇಶಿತ ಬಳಕೆ, ಉತ್ಪನ್ನದ ಕ್ಲೈಮ್ಗಳು, ನಿಖರ ಫಾರ್ಮ್ಯುಲೇಷನ್ ಮತ್ತು ಘಟಕ ಮೂಲವನ್ನು ಪರಿಶೀಲಿಸಿ.",
+                    "ಕಾನೂನು ತೀರ್ಮಾನಗಳಲ್ಲಿ ನಂಬಿಕೆ ಇಡಲು ಈ ಅಧಿಕಾರ ಪ್ರದೇಶದ ಪ್ರಸ್ತುತ ಪ್ರಾಥಮಿಕ ಮೂಲಗಳನ್ನು ಇಂಟಿಗ್ರೇಟ್ ಮಾಡಿ.",
+                ]
+            else:
+                summary = (
                     f"I can't support a {req.target_country} market-entry conclusion from the evidence currently indexed. "
                     "The official links below are starting points only; they have not been checked against your product. "
                     "First confirm whether this is sold as food or medicine, its intended use, exact composition and claims."
                     if req.jurisdiction_mode.value == "international"
                     else "I could not verify a reliable conclusion from the available evidence. Please add product details or consult an authorized source."
-                ),
+                )
+                next_steps = [
+                    "Confirm intended use, product claims, exact formulation and ingredient origin.",
+                    "Ingest current primary sources for this jurisdiction before relying on a legal conclusion.",
+                ]
+            return FinalResponse(
+                summary=summary,
                 classification=profile.model_dump(), applicable_domains=domains, recommendations=[], risks=warnings,
-                next_steps=["Confirm intended use, product claims, exact formulation and ingredient origin.", "Ingest current primary sources for this jurisdiction before relying on a legal conclusion."],
+                next_steps=next_steps,
                 human_review=True, disclaimer=DISCLAIMER, evidence=[], trace_id=trace_id,
                 memory_used=bool(state.get("memory")), demo_mode=settings.demo_mode,
                 source_pointers=source_pointers,
@@ -240,16 +289,47 @@ class Orchestrator:
             source_pointers = self._source_pointers(req)
             if source_pointers:
                 risks.append("Official source pointers below are discovery links, not verified evidence.")
-            return FinalResponse(
-                summary=(
+            lang = (req.language or "en").lower()
+            if lang == "hi":
+                summary = (
+                    f"मैं वर्तमान में इंडेक्स किए गए साक्ष्य के आधार पर {req.target_country} बाजार-प्रवेश निष्कर्ष का समर्थन नहीं कर सकता। "
+                    "नीचे दिए गए आधिकारिक लिंक केवल प्रारंभिक बिंदु हैं; वे आपके उत्पाद के खिलाफ सत्यापित नहीं किए गए हैं। "
+                    "पहले सत्यापित करें कि यह खाद्य या दवा के रूप में बेचा जा रहा है, इसका उद्देश्य, सटीक रचना और दावे क्या हैं।"
+                    if req.jurisdiction_mode.value == "international"
+                    else "मैं उपलब्ध साक्ष्य से विश्वसनीय निष्कर्ष सत्यापित नहीं कर सका। कृपया उत्पाद की जानकारी जोड़ें या अधिकृत स्रोत से परामर्श करें।"
+                )
+                next_steps = [
+                    "उद्देश्यित उपयोग, उत्पाद के दावे, सटीक फॉर्मूलेशन और घटक मूल को सत्यापित करें।",
+                    "कानूनी निष्कर्ष पर भरोसा करने से पहले इस अधिकार क्षेत्र के लिए वर्तमान प्राथमिक स्रोतों को इंटीग्रेट करें।",
+                ]
+            elif lang == "kn":
+                summary = (
+                    f"ಪ್ರಸ್ತುತ ಇಂಡೆಕ್ಸ್ಡ್ ಸಮರ್ಥನಗಳ ಆಧಾರದ ಮೇಲೆ {req.target_country} ಮಾರುಕಟ್ಟೆ-ಪ್ರವೇಶ ತೀರ್ಮಾನವನ್ನು ನಾನು ಬೆಂಬಲಿಸಲಾರೆನು. "
+                    "ಕೆಳಗಿನ ಅಧಿಕೃತ ಲಿಂಕ್ಗಳು ಕೇವಲ ಪ್ರಾರಂಭಿಕ ಬಿಂದುಗಳಾಗಿವೆ; ಅವು ನಿಮ್ಮ ಉತ್ಪನ್ನಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ಪರಿಶೀಲಿಸಿಲ್ಲ. "
+                    "ಮೊದಲಿಗೆ ಇದು ಆಹಾರ ಅಥವಾ ಔಷಧಿಯಾಗಿ ಮಾರಾಟವಾಗುತ್ತಿದೆಯೇ, ಅದರ ಉದ್ದೇಶ, ನಿಖರ ಸಂಯೋಜನೆ ಮತ್ತು ಕ್ಲೈಮ್ಗಳು ಯಾವುವು ಎಂಬುದನ್ನು ದೃಢೀಕರಿಸಿ."
+                    if req.jurisdiction_mode.value == "international"
+                    else "ಲಭ್ಯವಿರುವ ಸಮರ್ಥನಗಳಿಂದ ವಿಶ್ವಾಸಾರ್ಹ ತೀರ್ಮಾನವನ್ನು ನಾನು ಪರಿಶೀಲಿಸದಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ಉತ್ಪನ್ನ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ ಅಥವಾ ಅಧಿಕೃತ ಮೂಲದೊಂದಿಗೆ ಸಮಾಲೋಚಿಸಿ."
+                )
+                next_steps = [
+                    "ಉದ್ದೇಶಿತ ಬಳಕೆ, ಉತ್ಪನ್ನದ ಕ್ಲೈಮ್ಗಳು, ನಿಖರ ಫಾರ್ಮ್ಯುಲೇಷನ್ ಮತ್ತು ಘಟಕ ಮೂಲವನ್ನು ಪರಿಶೀಲಿಸಿ.",
+                    "ಕಾನೂನು ತೀರ್ಮಾನಗಳಲ್ಲಿ ನಂಬಿಕೆ ಇಡಲು ಈ ಅಧಿಕಾರ ಪ್ರದೇಶದ ಪ್ರಸ್ತುತ ಪ್ರಾಥಮಿಕ ಮೂಲಗಳನ್ನು ಇಂಟಿಗ್ರೇಟ್ ಮಾಡಿ.",
+                ]
+            else:
+                summary = (
                     f"I can't support a {req.target_country} market-entry conclusion from the evidence currently indexed. "
                     "The official links below are starting points only; they have not been checked against your product. "
                     "First confirm whether this is sold as food or medicine, its intended use, exact composition and claims."
                     if req.jurisdiction_mode.value == "international"
                     else "I could not verify a reliable conclusion from the available evidence. Please add product details or consult an authorized source."
-                ),
+                )
+                next_steps = [
+                    "Confirm intended use, product claims, exact formulation and ingredient origin.",
+                    "Ingest current primary sources for this jurisdiction before relying on a legal conclusion.",
+                ]
+            return FinalResponse(
+                summary=summary,
                 classification=profile.model_dump(), applicable_domains=domains, recommendations=[], risks=risks,
-                next_steps=["Confirm intended use, product claims, exact formulation and ingredient origin.", "Ingest current primary sources for this jurisdiction before relying on a legal conclusion."],
+                next_steps=next_steps,
                 human_review=True, disclaimer=DISCLAIMER, evidence=[], trace_id=trace_id,
                 memory_used=bool(memory_records), demo_mode=settings.demo_mode,
                 source_pointers=source_pointers,
