@@ -5,6 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 
+def normalize_database_url(database_url: str) -> str:
+    """Use the installed psycopg 3 driver for PostgreSQL URLs."""
+    if database_url.startswith("postgres://"):
+        return "postgresql+psycopg://" + database_url[len("postgres://"):]
+    if database_url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + database_url[len("postgresql://"):]
+    return database_url
+
+
 class Settings(BaseSettings):
     app_env: str = "development"
     app_version: str = "0.1.0"

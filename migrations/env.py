@@ -6,6 +6,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("apps/api"))
 from app.db.models import Base
+from app.core.config import normalize_database_url
 
 config = context.config
 if config.config_file_name:
@@ -15,7 +16,10 @@ target_metadata = Base.metadata
 
 env_url = os.getenv("DATABASE_URL")
 if env_url:
-    config.set_main_option("sqlalchemy.url", env_url)
+    config.set_main_option(
+        "sqlalchemy.url",
+        normalize_database_url(env_url).replace("%", "%%"),
+    )
 
 
 def run_migrations_offline():
