@@ -66,6 +66,36 @@ def seed():
             "citation": "Germany/EU — official authority pointer",
             "text": "DEMO EVIDENCE ONLY. Germany/EU requirements must be checked against current official product, IP, import, food, cosmetic and medicinal sources applicable to the product classification.",
         },
+        {
+            "source_id": "DEMO-US-USPTO",
+            "title": "Demo: USPTO Patent Information Pointer",
+            "url": "https://www.uspto.gov/patents",
+            "authority": "United States Patent and Trademark Office",
+            "jurisdiction": "US",
+            "regime": "patents",
+            "citation": "USPTO — official patent information portal",
+            "text": "DEMO EVIDENCE ONLY. Confirm current USPTO requirements and US patentability rules for the exact formulation, claims and prior art before relying on a protection strategy.",
+        },
+        {
+            "source_id": "DEMO-US-FDA",
+            "title": "Demo: FDA Dietary Supplement Pointer",
+            "url": "https://www.fda.gov/food/dietary-supplements",
+            "authority": "U.S. Food and Drug Administration",
+            "jurisdiction": "US",
+            "regime": "food_supplement",
+            "citation": "FDA — official dietary supplements portal",
+            "text": "DEMO EVIDENCE ONLY. Confirm the product category, ingredients, claims, labelling and current FDA requirements before marketing a supplement in the United States.",
+        },
+        {
+            "source_id": "DEMO-US-FTC",
+            "title": "Demo: FTC Health Claims Pointer",
+            "url": "https://www.ftc.gov/business-guidance/advertising-marketing/health-claims",
+            "authority": "Federal Trade Commission",
+            "jurisdiction": "US",
+            "regime": "advertising",
+            "citation": "FTC — official health claims advertising guidance",
+            "text": "DEMO EVIDENCE ONLY. Health and disease claims require current substantiation and must be reviewed against applicable FTC advertising standards before publication.",
+        },
     ]
     try:
         for d in demo:
